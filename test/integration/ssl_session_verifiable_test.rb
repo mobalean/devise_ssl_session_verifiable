@@ -5,12 +5,32 @@ class SslSessionVerifiableIntegrationTest < ActionController::IntegrationTest
     cookies.delete('admin_verify')
   end
 
-  test 'generate verify cookie after sign in' do
+  def assert_authenticated_and_verified(scope, user)
+    assert warden.authenticated?(scope), "expecting #{scope} to be authenticated"
+    assert_equal user, warden.user(scope), "expecting correct #{scope} to be signed in"
+    assert cookies["#{scope}_verify"], "expecting verify cookie"
+  end
+
+  test 'generate verify cookie after authentication' do
     admin = sign_in_as_admin_via_ssl
     assert_response :success
-    assert request.cookies["admin_verify"]
-    assert warden.authenticated?(:admin)
-    assert warden.user(:admin) == admin
+    assert_authenticated_and_verified(:admin, admin)
+  end
+
+  test 'generate verify cookie after manual sign in' do
+    admin = create_admin
+    visit manual_sign_in_admin_url(admin, :protocol => "https")
+    assert_response :success
+    assert_authenticated_and_verified(:admin, admin)
+  end
+
+  test 'generate verify cookie after token sign in' do
+    admin = create_admin
+    admin.reset_authentication_token!
+    assert admin.authentication_token
+    visit admin_root_url(admin, :auth_token => admin.authentication_token, :protocol => "https")
+    assert_response :success
+    assert_authenticated_and_verified(:admin, admin)
   end
 
   test 'generate remember token after sign in setting cookie options' do
@@ -38,6 +58,7 @@ class SslSessionVerifiableIntegrationTest < ActionController::IntegrationTest
     assert_not warden.authenticated?(:admin)
     assert_contain 'You need to sign in or sign up before continuing.'
     assert_not_contain 'Private!'
+    assert_blank cookies["admin_verify"]
   end
 
   test 'access non-SSL page but no verify cookie' do
@@ -49,4 +70,9 @@ class SslSessionVerifiableIntegrationTest < ActionController::IntegrationTest
     assert_contain 'Private!'
   end
 
+  test 'signout removes verify cookie' do
+    sign_in_as_admin_via_ssl
+    get destroy_admin_session_path
+    assert_blank cookies["admin_verify"]
+  end
 end
