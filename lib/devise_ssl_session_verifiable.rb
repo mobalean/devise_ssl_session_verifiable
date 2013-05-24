@@ -1,6 +1,7 @@
 require 'devise'
 
 module DeviseSslSessionVerifiable
+  autoload :FailureApp, 'devise_ssl_session_verifiable/failure_app'
 end
 
 Devise.add_module :ssl_session_verifiable, :model => 'devise/models/ssl_session_verifiable'

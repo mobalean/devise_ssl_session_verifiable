@@ -19,6 +19,40 @@ devise ..., :ssl_session_verifiable
 Make sure you have all login and other critical operations secured with SSL. You can inforce this in the routes for instance.
 
 
+### Advanced
+
+In case you would like to provide a special page for users which transition from non-SSL to SSL but fail the verification (maybe because they were logged in insecurely over HTTP), you can use the provided failure app to trigger a custom action. Setup steps:
+
+Setup the custom failure app and route in your routes:
+
+```ruby
+  devise_for :users,
+    :failure_app => DeviseSslSessionVerifiable::FailureApp,
+    :controllers => { :sessions => 'users/sessions' }
+
+  devise_scope :user do
+    match '/users/verify_auth' => "users/sessions#verify", :as => "verify_user_session", :via => :get
+  end
+```
+
+The verify_user_session_path should be under SSL. In your custom sessions controller, add a verify action like this:
+
+```ruby
+class Users::SessionsController < Devise::SessionsController
+  prepend_before_filter :require_no_authentication, :only => [ :verify ]
+
+  def verify
+    @back_to = stored_location_for(:user)
+    if session[:unverified_user]
+      @unverified_user = User.serialize_from_session(*session[:unverified_user])
+    end
+  end
+end
+```
+
+That way you also have access to the user record for which the ssl verification failed.
+
+
 ## License
 
 MIT License. Copyright 2013 Mobalean LLC. http://mobalean.com/

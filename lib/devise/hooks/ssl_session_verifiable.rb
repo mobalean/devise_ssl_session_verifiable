@@ -11,7 +11,7 @@ Warden::Manager.after_set_user :only => :fetch do |record, warden, options|
     unless Devise::Controllers::SslSessionVerifiable::Proxy.new(warden).secure_ssl_session?(record)
       Rails.logger.warn("SECURITY: did not find correct #{scope} verification cookie, logging out #{scope}")
       warden.logout(scope)
-      throw :warden, :scope => scope
+      throw :warden, :action => :unverified_ssl_access, :scope => scope, :unverified_record => record
     end
   end
 end
