@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class SslSessionVerifiableIntegrationTest < ActionController::IntegrationTest
+class SslSessionVerifiableIntegrationTest < ActionDispatch::IntegrationTest
   def drop_verification_cookie
     cookies.delete('admin_verify')
   end
