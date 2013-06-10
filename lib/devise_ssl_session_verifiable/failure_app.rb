@@ -22,7 +22,7 @@ module DeviseSslSessionVerifiable
     private
     def verify_session_path
       opts  = {}
-      route = :"verify_#{scope}_session_path"
+      route = :"new_#{scope}_session_verification_path"
       opts[:format] = request_format unless skip_format?
 
       config = Rails.application.config

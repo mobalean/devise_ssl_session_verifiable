@@ -31,17 +31,17 @@ Setup the custom failure app and route in your routes:
     :controllers => { :sessions => 'users/sessions' }
 
   devise_scope :user do
-    match '/users/verify_auth' => "users/sessions#verify", :as => "verify_user_session", :via => :get
+    scope as: "user" do
+      resource :session_verification, :only => [:new, :create]
+    end
   end
 ```
 
-The verify_user_session_path should be under SSL. In your custom sessions controller, add a verify action like this:
+The new_user_session_verification_path should be under SSL. In your custom sessions controller, add a verify action like this:
 
 ```ruby
-class Users::SessionsController < Devise::SessionsController
-  prepend_before_filter :require_no_authentication, :only => [ :verify ]
-
-  def verify
+class Users::SessionVerificationController < Devise::SessionsController
+  def new
     @back_to = stored_location_for(:user)
     if session[:unverified_user]
       @unverified_user = User.serialize_from_session(*session[:unverified_user])
