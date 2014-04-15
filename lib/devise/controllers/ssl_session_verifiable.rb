@@ -19,12 +19,12 @@ module Devise
 
       def secure_ssl_session?(resource)
         scope = Devise::Mapping.find_scope!(resource)
-        cookies.signed[ssl_session_verification_key(scope)] == resource.id
+        cookies.signed_or_encrypted[ssl_session_verification_key(scope)] == resource.id
       end
 
       def set_ssl_session_verification_cookie(resource)
         scope = Devise::Mapping.find_scope!(resource)
-        cookies.signed[ssl_session_verification_key(scope)] = ssl_session_verification_cookie_values(resource)
+        cookies.signed_or_encrypted[ssl_session_verification_key(scope)] = ssl_session_verification_cookie_values(resource)
       end
 
       def remove_ssl_session_verification_cookie(resource)

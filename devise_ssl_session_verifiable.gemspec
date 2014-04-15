@@ -19,4 +19,5 @@ Gem::Specification.new do |s|
   s.require_paths = ["lib"]
 
   s.add_dependency("devise", "> 3.2")
+  s.add_dependency("railties", ">= 4.0.0")
 end

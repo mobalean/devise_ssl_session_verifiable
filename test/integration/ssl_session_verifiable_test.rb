@@ -42,6 +42,16 @@ class SslSessionVerifiableIntegrationTest < ActionDispatch::IntegrationTest
     assert_contain 'Private!'
   end
 
+  test 'access SSL with signed cookie' do
+    admin = sign_in_as_admin_via_ssl
+    cookies.delete('admin_verify')
+    cookies['admin_verify'] = ActiveSupport::MessageVerifier.new(Rails.application.config.secret_token).generate(admin.id)
+    visit private_url(:protocol => "https")
+    assert_response :success
+    assert_template 'home/private'
+    assert_contain 'Private!'
+  end
+
   test 'access SSL page but no verify cookie' do
     sign_in_as_admin_via_ssl
     drop_verification_cookie
