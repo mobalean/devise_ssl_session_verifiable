@@ -24,15 +24,6 @@ class SslSessionVerifiableIntegrationTest < ActionDispatch::IntegrationTest
     assert_authenticated_and_verified(:admin, admin)
   end
 
-  test 'generate verify cookie after token sign in' do
-    admin = create_admin
-    admin.reset_authentication_token!
-    assert admin.authentication_token
-    visit admin_root_url(admin, :auth_token => admin.authentication_token, :protocol => "https")
-    assert_response :success
-    assert_authenticated_and_verified(:admin, admin)
-  end
-
   test 'generate remember token after sign in setting cookie options' do
     # We test this by asserting the cookie is not sent after the redirect
     # since we changed the domain. This is the only difference with the

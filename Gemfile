@@ -3,7 +3,7 @@ source "http://rubygems.org"
 gemspec
 
 gem "rails", "~> 4.0.0.rc1"
-gem "devise", "3.0.0.rc"
+gem "devise", "~> 3.2.1"
 gem "sqlite3"
 
 group :test do
