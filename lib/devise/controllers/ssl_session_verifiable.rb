@@ -22,6 +22,7 @@ module Devise
         cookies.signed_or_encrypted[ssl_session_verification_key(scope)] == resource.id
       rescue => err
         cookies.delete(ssl_session_verification_key(scope), base_ssl_session_verification_cookie_values(resource))
+        false
       end
 
       def set_ssl_session_verification_cookie(resource)
