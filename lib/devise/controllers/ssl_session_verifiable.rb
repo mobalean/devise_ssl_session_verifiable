@@ -49,7 +49,13 @@ module Devise
         options = { :httponly => true }
         options.merge!(base_ssl_session_verification_cookie_values(resource))
         options[:value] = resource.id
-        options[:expires] = Time.now.years_since(10) if resource.respond_to?(:remember_me?) && resource.remember_me?
+        if resource.respond_to?(:remember_me?) && (
+             Gem.loaded_specs['devise'].version.to_s <= '3.5.4' ?
+               resource.remember_me? :
+               resource.remember_me?(resource.rememberable_value, Time.now)
+           )
+          options[:expires] = Time.now.years_since(10)
+        end
         options
       end
     end
